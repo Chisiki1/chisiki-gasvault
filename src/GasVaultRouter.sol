@@ -91,6 +91,7 @@ contract GasVaultRouter is ReentrancyGuard, Pausable, Ownable2Step {
     // ── Errors ──
     error NotChisikiContract(address target);
     error ActionCallFailed(address target);
+    error SwapFailed();
     error ExceedsGasLimit(uint256 gasUsed);
     error ExceedsRefundCap(uint256 cktNeeded);
     error ExceedsDailyCap(address user, uint256 dailyUsed);
@@ -416,16 +417,14 @@ contract GasVaultRouter is ReentrancyGuard, Pausable, Ownable2Step {
             ISwapRouter.ExactInputParams({
                 path: path,
                 recipient: address(this),
-                deadline: block.timestamp,
                 amountIn: cktAmount,
                 amountOutMinimum: (minEthOut * 99) / 100 // 1% slippage tolerance (TWAP-based)
             })
         ) returns (uint256 result) {
             amountOut = result;
         } catch {
-            // Reset allowance on failure
-            ckt.safeDecreaseAllowance(address(swapRouter), cktAmount);
-            return 0;
+            // Revert entire tx — CKT consumption is also rolled back
+            revert SwapFailed();
         }
 
         // Unwrap WETH to ETH
@@ -487,7 +486,6 @@ contract GasVaultRouter is ReentrancyGuard, Pausable, Ownable2Step {
                     tokenOut: address(usdc),
                     fee: CKT_USDC_FEE,
                     recipient: address(this),
-                    deadline: block.timestamp,
                     amountIn: halfCkt,
                     amountOutMinimum: 0, // Small amounts, MEV unlikely
                     sqrtPriceLimitX96: 0

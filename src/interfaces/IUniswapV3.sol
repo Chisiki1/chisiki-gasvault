@@ -8,7 +8,6 @@ interface ISwapRouter {
         address tokenOut;
         uint24 fee;
         address recipient;
-        uint256 deadline;
         uint256 amountIn;
         uint256 amountOutMinimum;
         uint160 sqrtPriceLimitX96;
@@ -17,7 +16,6 @@ interface ISwapRouter {
     struct ExactInputParams {
         bytes path;
         address recipient;
-        uint256 deadline;
         uint256 amountIn;
         uint256 amountOutMinimum;
     }

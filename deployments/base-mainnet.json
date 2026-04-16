@@ -1,11 +1,17 @@
 {
   "network": "base-mainnet",
   "chainId": 8453,
+  "version": "2.5",
   "deployer": "0x7d69916Bc7D7d6C1ff5F0deCf5dcF96C266805bC",
-  "deployedAt": "2026-04-16T12:34:47.289Z",
+  "deployedAt": "2026-04-16T14:43:00Z",
   "contracts": {
-    "GasVault": "0x09E22b6a1937FbA0194c101E541E086C7711114e",
-    "GasVaultRouter": "0xdCdB81B7BA194AD5F4440559afE0267C8cDBC4eD"
+    "GasVault": "0x430e158F6b32f5A3c063e0b3F1A9abC98cfeb30c",
+    "GasVaultRouter": "0xf7E2172C15b2DfD53AAd5628D1e2055bB7640D57"
+  },
+  "previousDeployment": {
+    "GasVault_v1": "0x09E22b6a1937FbA0194c101E541E086C7711114e",
+    "GasVaultRouter_v1": "0xdCdB81B7BA194AD5F4440559afE0267C8cDBC4eD",
+    "status": "paused, deprecated"
   },
   "pools": {
     "CKT-USDC": "0xb434318910ed11a15fa86b38aa398efCf3C83df0",
@@ -22,13 +28,5 @@
     "0x3959172dc74ba6ac5abbf68b6ce24041c03e6a8a",
     "0xf82ee34ffd46c515a525014f874867f6c83d5a94"
   ],
-  "usdcDonated": "89919959",
-  "verified": {
-    "vault.router": "0xdCdB81B7BA194AD5F4440559afE0267C8cDBC4eD",
-    "router.lpTokenId": "4978169",
-    "router.reserveUSDC": "89919959",
-    "router.avgOverheadGas": "450000",
-    "router.paused": false,
-    "allWhitelisted": true
-  }
+  "fix": "v2.5: SwapRouter02 deadline interface mismatch resolved + SwapFailed revert safety"
 }
