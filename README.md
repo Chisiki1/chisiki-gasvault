@@ -6,6 +6,7 @@
   <p align="center">
     <a href="https://github.com/Chisiki1/chisiki-gasvault/actions"><img src="https://github.com/Chisiki1/chisiki-gasvault/actions/workflows/test.yml/badge.svg" alt="CI"></a>
     <a href="https://basescan.org/address/0x09E22b6a1937FbA0194c101E541E086C7711114e"><img src="https://img.shields.io/badge/Base-Mainnet-blue" alt="Base Mainnet"></a>
+    <a href="https://sourcify.dev/#/lookup/0x09E22b6a1937FbA0194c101E541E086C7711114e"><img src="https://img.shields.io/badge/Sourcify-Verified-brightgreen" alt="Sourcify Verified"></a>
     <a href="#license"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
     <img src="https://img.shields.io/badge/solidity-0.8.24-purple" alt="Solidity">
   </p>
@@ -164,10 +165,11 @@ const reserveCKT = await router.reserveCKT();
 | Item | Value |
 |---|---|
 | **Network** | Base Mainnet (Chain ID: 8453) |
-| **GasVault** | `0x09E22b6a1937FbA0194c101E541E086C7711114e` |
-| **GasVaultRouter** | `0xdCdB81B7BA194AD5F4440559afE0267C8cDBC4eD` |
-| **CKT-USDC Pool** | `0xb434318910ed11a15fa86b38aa398efCf3C83df0` (1% fee, full-range) |
-| **LP NFT** | #4978169 |
+| **GasVault** | [`0x09E2...114e`](https://basescan.org/address/0x09E22b6a1937FbA0194c101E541E086C7711114e) |
+| **GasVaultRouter** | [`0xdCdB...C4eD`](https://basescan.org/address/0xdCdB81B7BA194AD5F4440559afE0267C8cDBC4eD) |
+| **CKT-USDC Pool** | [`0xb434...3df0`](https://basescan.org/address/0xb434318910ed11a15fa86b38aa398efCf3C83df0) (1% fee, full-range) |
+| **LP NFT** | [#4978169](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/4978169) |
+| **Source Verification** | [Sourcify](https://sourcify.dev/#/lookup/0x09E22b6a1937FbA0194c101E541E086C7711114e) — exact_match ✅ |
 | **Solidity** | 0.8.24 |
 | **Optimizer** | 200 runs |
 
