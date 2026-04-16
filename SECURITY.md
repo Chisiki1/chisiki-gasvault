@@ -22,7 +22,8 @@ If you discover a security vulnerability, please report it responsibly:
 | `deposit()` | Anyone | — |
 | `executeWithRefund()` | Anyone | Whitelisted targets only |
 | `consumeForRefund()` | Router only | Enforced by Vault |
-| `setRouter()` | Owner | 48-hour timelock |
+| `setInitialRouter()` | Owner | One-time only, before any router is set |
+| `proposeRouterChange()` | Owner | 48-hour timelock |
 | `pause()` / `unpause()` | Owner | Ownable2Step |
 | `rescueTokens()` | Owner | Cannot touch reserved funds |
 

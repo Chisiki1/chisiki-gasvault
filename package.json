@@ -1,6 +1,6 @@
 {
     "name": "chisiki-gasvault",
-    "version": "1.0.0",
+    "version": "2.5.0",
     "description": "Chisiki Gas Vault - Autonomous gasless service on Base L2",
     "private": true,
     "dependencies": {
