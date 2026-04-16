@@ -14,7 +14,7 @@
 
 const { ethers } = require("ethers");
 
-const ROUTER = "0xdCdB81B7BA194AD5F4440559afE0267C8cDBC4eD";
+const ROUTER = "0xf7E2172C15b2DfD53AAd5628D1e2055bB7640D57";
 const USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const CKT = "0x5ccdf98d0b48bf8d51e9196d738c5bbf6b33c274";
 

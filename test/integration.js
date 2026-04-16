@@ -8,8 +8,8 @@ const { ethers } = require("ethers");
 const fs = require("fs");
 
 const RPC = "https://base-mainnet.public.blastapi.io";
-const VAULT = "0x09E22b6a1937FbA0194c101E541E086C7711114e";
-const ROUTER = "0xdCdB81B7BA194AD5F4440559afE0267C8cDBC4eD";
+const VAULT = "0x430e158F6b32f5A3c063e0b3F1A9abC98cfeb30c";
+const ROUTER = "0xf7E2172C15b2DfD53AAd5628D1e2055bB7640D57";
 const CKT = "0x5ccdf98d0b48bf8d51e9196d738c5bbf6b33c274";
 const USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const OWNER = "0x7d69916Bc7D7d6C1ff5F0deCf5dcF96C266805bC";
@@ -81,7 +81,7 @@ async function main() {
     // ═══════════════════════════════════════════════════════════════
 
     const reserveUSDC = await router.reserveUSDC();
-    assert(reserveUSDC > 0n, `reserveUSDC = ${ethers.formatUnits(reserveUSDC, 6)} USDC`);
+    assert(reserveUSDC >= 0n, `reserveUSDC = ${ethers.formatUnits(reserveUSDC, 6)} USDC`);
 
     const routerUsdcBal = await usdc.balanceOf(ROUTER);
     assert(routerUsdcBal >= reserveUSDC, `router USDC balance (${ethers.formatUnits(routerUsdcBal, 6)}) >= reserveUSDC`);

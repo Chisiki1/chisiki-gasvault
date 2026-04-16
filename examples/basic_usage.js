@@ -15,8 +15,8 @@ const { ethers } = require("ethers");
 
 // ── Base Mainnet Addresses ──
 const ADDRESSES = {
-    GasVault: "0x09E22b6a1937FbA0194c101E541E086C7711114e",
-    GasVaultRouter: "0xdCdB81B7BA194AD5F4440559afE0267C8cDBC4eD",
+    GasVault: "0x430e158F6b32f5A3c063e0b3F1A9abC98cfeb30c",
+    GasVaultRouter: "0xf7E2172C15b2DfD53AAd5628D1e2055bB7640D57",
     CKT: "0x5ccdf98d0b48bf8d51e9196d738c5bbf6b33c274",
     QAEscrow: "0x12dc6fbaa22d38ebbec425ba76db82f0c8594306",
 };
