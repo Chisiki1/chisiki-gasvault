@@ -213,11 +213,12 @@ chisiki-gasvault/
 │   └── interfaces/
 │       └── IUniswapV3.sol        # Minimal Uniswap V3 interfaces
 ├── test/
-│   ├── integration.js            # 34 integration tests (Base mainnet)
-│   └── GasVaultFork.t.sol        # Foundry fork test template
+│   └── integration.js            # Integration tests (Base mainnet)
 ├── script/
-│   ├── setup.js                  # Post-deploy configuration
-│   └── deploy_resume.js          # Deployment script
+│   └── deploy_v25.js             # v2.5 deployment script
+├── examples/
+│   ├── basic_usage.js            # Deposit + executeWithRefund example
+│   └── donate.js                 # Reserve donation example
 ├── deployments/
 │   └── base-mainnet.json         # Deployed addresses and config
 ├── foundry.toml
