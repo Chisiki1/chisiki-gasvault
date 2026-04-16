@@ -309,19 +309,29 @@ contract GasVaultRouter is ReentrancyGuard, Pausable, Ownable2Step {
      * @notice Estimate CKT cost via TWAP (5-minute average). Used as safety check.
      */
     function _estimateCktViaTwap(uint256 ethAmount) internal view returns (uint256) {
-        // Get USDC/WETH TWAP
-        uint256 usdcPerWeth = _getTwapPrice(usdcWethPool);
-        if (usdcPerWeth == 0) return 0;
+        // Get USDC/WETH TWAP — _tickToPrice returns token1/token0 * 1e18
+        // USDC-WETH pool: token0=USDC, token1=WETH → returns WETH/USDC * 1e18
+        // We need USDC per ETH, so: usdcNeeded = ethAmount * 1e18 / (WETH/USDC)
+        uint256 wethPerUsdc = _getTwapPrice(usdcWethPool);
+        if (wethPerUsdc == 0) return 0;
 
-        // USDC needed for ethAmount
-        uint256 usdcNeeded = (ethAmount * usdcPerWeth) / 1e18;
+        // USDC needed for ethAmount (USDC has 6 decimals, ETH has 18)
+        // usdcNeeded = ethAmount / (wethPerUsdc / 1e18) = ethAmount * 1e18 / wethPerUsdc
+        // But result needs to be in USDC 6-decimal units:
+        // ethAmount is in wei (18 dec), wethPerUsdc is WETH/USDC * 1e18
+        // usdcNeeded (6 dec) = ethAmount (18 dec) * 1e6 / wethPerUsdc
+        uint256 usdcNeeded = (ethAmount * 1e6) / wethPerUsdc;
 
-        // Get CKT/USDC TWAP
-        uint256 cktPerUsdc = _getTwapPrice(cktUsdcPool);
-        if (cktPerUsdc == 0) return 0;
+        // Get CKT-USDC TWAP — token0=CKT, token1=USDC → returns USDC/CKT * 1e18
+        uint256 usdcPerCkt = _getTwapPrice(cktUsdcPool);
+        if (usdcPerCkt == 0) return 0;
 
-        // CKT needed
-        return (usdcNeeded * cktPerUsdc) / 1e6; // USDC is 6 decimals
+        // CKT needed = usdcNeeded / (USDC per CKT)
+        // usdcNeeded is 6 dec, usdcPerCkt is USDC/CKT * 1e18
+        // cktNeeded (18 dec) = usdcNeeded * 1e18 * 1e12 / usdcPerCkt
+        //                    = usdcNeeded * 1e30 / usdcPerCkt
+        // The 1e12 bridges USDC 6-dec → CKT 18-dec
+        return (usdcNeeded * 1e30) / usdcPerCkt;
     }
 
     /**
@@ -509,10 +519,18 @@ contract GasVaultRouter is ReentrancyGuard, Pausable, Ownable2Step {
                 amount1Min: 0,
                 deadline: block.timestamp
             })
-        ) returns (uint128 liquidity, uint256, uint256) {
-            emit FeesAddedToLP(totalCkt, usdcAmount, liquidity);
+        ) returns (uint128 liquidity, uint256 amount0Used, uint256 amount1Used) {
+            // Recover unused tokens to reserves (zero-leak design)
+            (uint256 cktUsed, uint256 usdcUsed) = address(ckt) < address(usdc)
+                ? (amount0Used, amount1Used)
+                : (amount1Used, amount0Used);
+            if (totalCkt > cktUsed) reserveCKT += totalCkt - cktUsed;
+            if (usdcAmount > usdcUsed) reserveUSDC += usdcAmount - usdcUsed;
+            emit FeesAddedToLP(cktUsed, usdcUsed, liquidity);
         } catch {
-            // Revert allowances on failure (best-effort)
+            // Return tokens to reserves on failure
+            reserveCKT += totalCkt;
+            reserveUSDC += usdcAmount;
         }
     }
 
@@ -572,10 +590,18 @@ contract GasVaultRouter is ReentrancyGuard, Pausable, Ownable2Step {
                 amount1Min: 0,
                 deadline: block.timestamp
             })
-        ) returns (uint128 liquidity, uint256, uint256) {
-            emit FeesReinvested(cktCollected, usdcCollected, liquidity);
+        ) returns (uint128 liquidity, uint256 amount0Used, uint256 amount1Used) {
+            // Recover unused tokens to reserves (zero-leak design)
+            (uint256 cktUsed, uint256 usdcUsed) = address(ckt) < address(usdc)
+                ? (amount0Used, amount1Used)
+                : (amount1Used, amount0Used);
+            if (cktCollected > cktUsed) reserveCKT += cktCollected - cktUsed;
+            if (usdcCollected > usdcUsed) reserveUSDC += usdcCollected - usdcUsed;
+            emit FeesReinvested(cktUsed, usdcUsed, liquidity);
         } catch {
-            // Silent fail for piggyback — not critical
+            // Return tokens to reserves on failure
+            reserveCKT += cktCollected;
+            reserveUSDC += usdcCollected;
         }
     }
 
