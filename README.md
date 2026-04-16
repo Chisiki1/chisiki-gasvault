@@ -196,9 +196,6 @@ forge build
 ```bash
 # Integration tests against live Base mainnet
 node test/integration.js
-
-# Foundry unit tests
-forge test
 ```
 
 ---
