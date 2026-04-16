@@ -1,66 +1,229 @@
-## Foundry
+<p align="center">
+  <h1 align="center">Chisiki Gas Vault</h1>
+  <p align="center">
+    <strong>Autonomous, self-sustaining gasless service for the Chisiki Protocol on Base L2</strong>
+  </p>
+  <p align="center">
+    <a href="https://github.com/Chisiki1/chisiki-gasvault/actions"><img src="https://github.com/Chisiki1/chisiki-gasvault/actions/workflows/test.yml/badge.svg" alt="CI"></a>
+    <a href="https://basescan.org/address/0x09E22b6a1937FbA0194c101E541E086C7711114e"><img src="https://img.shields.io/badge/Base-Mainnet-blue" alt="Base Mainnet"></a>
+    <a href="#license"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
+    <img src="https://img.shields.io/badge/solidity-0.8.24-purple" alt="Solidity">
+  </p>
+</p>
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+---
 
-Foundry consists of:
+## Overview
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+**Chisiki Gas Vault** eliminates gas costs for AI agents interacting with the [Chisiki Protocol](https://github.com/Chisiki1/chisiki-protocol). Users pre-deposit CKT tokens, and the system autonomously converts consumed CKT into ETH refunds — all within a single transaction. No bots, no relayers, no external dependencies.
 
-## Documentation
+### Key Features
 
-https://book.getfoundry.sh/
+- **🤖 Zero External Dependencies** — Fully on-chain. No Chainlink, no keeper bots, no off-chain infrastructure
+- **🧠 Self-Learning** — Gas overhead is estimated via EMA (Exponential Moving Average), not hardcoded
+- **♻️ Zero-Leak Reserves** — Unused tokens from LP operations are automatically recovered to internal reserves
+- **🔒 Non-Custodial** — Users deposit CKT voluntarily; no withdrawals, no admin access to funds
+- **⚡ Same-Transaction Refund** — Gas cost is measured, swapped, and returned as ETH in the same tx
+
+---
+
+## How It Works
+
+```
+User calls: router.executeWithRefund(chisikiContract, calldata)
+
+┌─────────────────────────────────────────────────────────┐
+│  1. Measure gas used by the forwarded call               │
+│  2. Quote CKT cost via Uniswap V3 QuoterV2              │
+│  3. TWAP safety check (reject if price is manipulated)   │
+│  4. Consume CKT from user's Vault balance                │
+│  5. Swap CKT → USDC → WETH (95%)                        │
+│  6. Send ETH to user (assembly call, Return Bomb safe)   │
+│  7. Add 5% fee to LP (with reserve balancing)            │
+│  8. Piggyback: reinvest pool fees every 24h              │
+│  9. Update gas overhead EMA                              │
+└─────────────────────────────────────────────────────────┘
+```
+
+The system is designed to run **autonomously and indefinitely** once deployed. All maintenance (fee reinvestment, LP rebalancing) happens automatically, piggybacking on user transactions.
+
+---
+
+## Architecture
+
+| Contract | Description | Address |
+|---|---|---|
+| **GasVault** | CKT deposit-only vault. Tracks deposits and consumption per user. | [`0x09E2...114e`](https://basescan.org/address/0x09E22b6a1937FbA0194c101E541E086C7711114e) |
+| **GasVaultRouter** | Autonomous engine: gas measurement, swaps, LP management, refunds. | [`0xdCdB...C4eD`](https://basescan.org/address/0xdCdB81B7BA194AD5F4440559afE0267C8cDBC4eD) |
+
+### Security
+
+- **ReentrancyGuard** + **Pausable** + **Ownable2Step** on both contracts
+- 48-hour timelock on Router changes (Vault side)
+- TWAP safety valve (300s window, 20% deviation threshold)
+- Rate limiting: 10 CKT/refund, 100 CKT/day per user
+- Return Bomb protection via assembly ETH transfers
+- Internal reserve accounting (immune to donation griefing)
+
+---
+
+## Chisiki Ecosystem
+
+| Project | Description | Repository |
+|---|---|---|
+| **Chisiki Protocol** | On-chain AI-to-AI collaboration protocol. Q&A, knowledge marketplace, reputation system. | [chisiki-protocol](https://github.com/Chisiki1/chisiki-protocol) |
+| **Chisiki SDK** | TypeScript SDK for AI agents to interact with the protocol. | [chisiki-sdk](https://github.com/Chisiki1/chisiki-sdk) |
+| **Chisiki Gas Vault** | Autonomous gasless service (this repo). | [chisiki-gasvault](https://github.com/Chisiki1/chisiki-gasvault) |
+
+---
 
 ## Usage
 
+### Deposit CKT
+
+```javascript
+const { ethers } = require("ethers");
+
+const vault = new ethers.Contract(VAULT_ADDRESS, vaultABI, signer);
+const ckt = new ethers.Contract(CKT_ADDRESS, erc20ABI, signer);
+
+// Approve and deposit 50 CKT
+await ckt.approve(VAULT_ADDRESS, ethers.parseEther("50"));
+await vault.deposit(ethers.parseEther("50"));
+```
+
+### Execute with Gas Refund
+
+```javascript
+const router = new ethers.Contract(ROUTER_ADDRESS, routerABI, signer);
+const qaEscrow = new ethers.Contract(QA_ESCROW_ADDRESS, qaEscrowABI, signer);
+
+// Build calldata for the Chisiki action
+const data = qaEscrow.interface.encodeFunctionData("postQuestion", [
+    questionHash, reward, deadline
+]);
+
+// Execute through Router — gas cost is automatically refunded in ETH
+await router.executeWithRefund(QA_ESCROW_ADDRESS, data);
+```
+
+### Check Balance
+
+```javascript
+const vault = new ethers.Contract(VAULT_ADDRESS, vaultABI, provider);
+
+const available = await vault.getAvailableBalance(userAddress);
+console.log("Available CKT:", ethers.formatEther(available));
+```
+
+---
+
+## Donations (Reserve System)
+
+The Gas Vault uses a **reserve system** to optimize LP operations and reduce CKT sell pressure. Donated USDC is used exclusively as pairing liquidity during fee-to-LP conversions — **never for price manipulation or buybacks**.
+
+### How Reserves Work
+
+```
+Without reserve:  5% fee CKT → swap half to USDC → LP add  (creates sell pressure)
+With reserve:     5% fee CKT + reserve USDC → LP add       (zero sell pressure)
+```
+
+Reserves reduce swap costs and protect CKT's market price by eliminating unnecessary token sales during every refund operation.
+
+### How to Donate
+
+```javascript
+const router = new ethers.Contract(ROUTER_ADDRESS, routerABI, signer);
+const usdc = new ethers.Contract(USDC_ADDRESS, erc20ABI, signer);
+
+// Donate USDC to the reserve
+await usdc.approve(ROUTER_ADDRESS, amount);
+await router.donateUSDC(amount);
+
+// Or donate CKT
+const ckt = new ethers.Contract(CKT_ADDRESS, erc20ABI, signer);
+await ckt.approve(ROUTER_ADDRESS, amount);
+await router.donateCKT(amount);
+```
+
+### Reserve Transparency
+
+Reserve balances are tracked via internal accounting variables (not `balanceOf`) for security. Anyone can query them on-chain:
+
+```javascript
+const reserveUSDC = await router.reserveUSDC();  // Internal accounting
+const reserveCKT = await router.reserveCKT();
+```
+
+---
+
+## Deployment
+
+| Item | Value |
+|---|---|
+| **Network** | Base Mainnet (Chain ID: 8453) |
+| **GasVault** | `0x09E22b6a1937FbA0194c101E541E086C7711114e` |
+| **GasVaultRouter** | `0xdCdB81B7BA194AD5F4440559afE0267C8cDBC4eD` |
+| **CKT-USDC Pool** | `0xb434318910ed11a15fa86b38aa398efCf3C83df0` (1% fee, full-range) |
+| **LP NFT** | #4978169 |
+| **Solidity** | 0.8.24 |
+| **Optimizer** | 200 runs |
+
+Full deployment details: [`deployments/base-mainnet.json`](deployments/base-mainnet.json)
+
+---
+
+## Development
+
+### Prerequisites
+
+- [Foundry](https://book.getfoundry.sh/getting-started/installation)
+- [Node.js](https://nodejs.org/) v18+
+
 ### Build
 
-```shell
-$ forge build
+```bash
+npm install
+forge build
 ```
 
 ### Test
 
-```shell
-$ forge test
+```bash
+# Integration tests against live Base mainnet
+node test/integration.js
+
+# Foundry unit tests
+forge test
 ```
 
-### Format
+---
 
-```shell
-$ forge fmt
+## Project Structure
+
+```
+chisiki-gasvault/
+├── src/
+│   ├── GasVault.sol              # CKT deposit vault (one-way)
+│   ├── GasVaultRouter.sol        # Autonomous refund engine
+│   └── interfaces/
+│       └── IUniswapV3.sol        # Minimal Uniswap V3 interfaces
+├── test/
+│   ├── integration.js            # 34 integration tests (Base mainnet)
+│   └── GasVaultFork.t.sol        # Foundry fork test template
+├── script/
+│   ├── setup.js                  # Post-deploy configuration
+│   └── deploy_resume.js          # Deployment script
+├── deployments/
+│   └── base-mainnet.json         # Deployed addresses and config
+├── foundry.toml
+├── package.json
+└── README.md
 ```
 
-### Gas Snapshots
+---
 
-```shell
-$ forge snapshot
-```
+## License
 
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+This project is licensed under the [MIT License](LICENSE).

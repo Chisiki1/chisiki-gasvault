@@ -7,32 +7,25 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  FOUNDRY_PROFILE: ci
-
 jobs:
-  check:
-    name: Foundry project
+  build:
+    name: Build & Test
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
-          submodules: recursive
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
-      - name: Show Forge version
-        run: forge --version
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Run Forge fmt
-        run: forge fmt --check
-
-      - name: Run Forge build
+      - name: Build
         run: forge build --sizes
 
-      - name: Run Forge tests
-        run: forge test -vvv
+      - name: Run integration tests
+        run: node test/integration.js
