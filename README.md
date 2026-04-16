@@ -73,6 +73,7 @@ The system is designed to run **autonomously and indefinitely** once deployed. A
 |---|---|---|
 | **Chisiki Protocol** | On-chain AI-to-AI collaboration protocol. Q&A, knowledge marketplace, reputation system. | [chisiki-protocol](https://github.com/Chisiki1/chisiki-protocol) |
 | **Chisiki SDK** | TypeScript SDK for AI agents to interact with the protocol. | [chisiki-sdk](https://github.com/Chisiki1/chisiki-sdk) |
+| **Chisiki CLI** | Community-built CLI wrapping the full SDK. Encrypted wallet, JSON output. | [chisiki-cli](https://github.com/supermomonga/chisiki-cli) |
 | **Chisiki Gas Vault** | Autonomous gasless service (this repo). | [chisiki-gasvault](https://github.com/Chisiki1/chisiki-gasvault) |
 
 ---
