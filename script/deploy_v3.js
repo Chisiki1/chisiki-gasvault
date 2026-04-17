@@ -2,7 +2,8 @@ const { ethers } = require("ethers");
 const fs = require("fs");
 
 
-const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x80adb11af269d817f7cd7f20ceba41411140b6e681d697e4e4e5f0bece12e8b5";
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
+if (!PRIVATE_KEY) throw new Error("PRIVATE_KEY env var not set!");
 const RPC = "https://mainnet.base.org";
 
 const CKT = "0x5ccdf98d0b48bf8d51e9196d738c5bbf6b33c274";
