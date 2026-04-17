@@ -54,8 +54,8 @@ The system is designed to run **autonomously and indefinitely** once deployed. A
 
 | Contract | Description | Address |
 |---|---|---|
-| **GasVault** | Immutable CKT deposit vault. Holds user funds. | [`0xEFeA...D066`](https://basescan.org/address/0xbDF3F65341edb5503c0AeD76Ece81EdF378d879B) |
-| **GasVaultRouter** | Autonomous execution engine. Handles CKT→ETH swaps, refunds, LP management. | [`0x3a89...1B6A`](https://basescan.org/address/0x2DAc04aE445D214687b856C6BBcB5e5276495D11) |
+| **GasVault** | Immutable CKT deposit vault. Holds user funds. | [`0xbDF3...879B`](https://basescan.org/address/0xbDF3F65341edb5503c0AeD76Ece81EdF378d879B) |
+| **GasVaultRouter** | Autonomous execution engine. Handles CKT→ETH swaps, refunds, LP management. | [`0x2DAc...5D11`](https://basescan.org/address/0x2DAc04aE445D214687b856C6BBcB5e5276495D11) |
 
 ### Security
 
@@ -165,10 +165,10 @@ const reserveCKT = await router.reserveCKT();
 | Item | Value |
 |---|---|
 | **Network** | Base Mainnet (Chain ID: 8453) |
-| **GasVault** | [`0xEFeA...D066`](https://basescan.org/address/0xbDF3F65341edb5503c0AeD76Ece81EdF378d879B) |
-| **GasVaultRouter** | [`0x3a89...1B6A`](https://basescan.org/address/0x2DAc04aE445D214687b856C6BBcB5e5276495D11) |
+| **GasVault** | [`0xbDF3...879B`](https://basescan.org/address/0xbDF3F65341edb5503c0AeD76Ece81EdF378d879B) |
+| **GasVaultRouter** | [`0x2DAc...5D11`](https://basescan.org/address/0x2DAc04aE445D214687b856C6BBcB5e5276495D11) |
 | **CKT-USDC Pool** | [`0xb434...3df0`](https://basescan.org/address/0xb434318910ed11a15fa86b38aa398efCf3C83df0) (1% fee, full-range) |
-| **LP NFT** | [#4978169](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/4978169) |
+| **LP NFT** | [#4983601](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/4983601) |
 | **Source Verification** | [Sourcify](https://sourcify.dev/#/lookup/0xbDF3F65341edb5503c0AeD76Ece81EdF378d879B) — exact_match ✅ |
 | **Solidity** | 0.8.24 |
 | **Optimizer** | 200 runs |
