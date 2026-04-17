@@ -22,9 +22,6 @@ contract GasVault is ReentrancyGuard, Pausable, Ownable2Step {
     // ── State ──
     IERC20 public immutable cktToken;
     address public router;
-    address public pendingRouter;
-    uint256 public routerChangeTime;
-    uint256 public constant ROUTER_CHANGE_DELAY = 48 hours;
 
     mapping(address => uint256) public deposits;
     mapping(address => uint256) public consumed;
@@ -39,8 +36,6 @@ contract GasVault is ReentrancyGuard, Pausable, Ownable2Step {
     error OnlyRouter();
     error InsufficientBalance(address user, uint256 available, uint256 requested);
     error ZeroAmount();
-    error RouterChangeLocked();
-    error NoPendingRouter();
 
     constructor(address _cktToken, address _owner) Ownable(_owner) {
         require(_cktToken != address(0), "GasVault: zero CKT");
@@ -89,29 +84,15 @@ contract GasVault is ReentrancyGuard, Pausable, Ownable2Step {
         return deposits[user] - consumed[user];
     }
 
-    // ── Admin: Router change (48h timelock) ──
+    // ── Admin: Router change (Instant) ──
 
     /**
-     * @notice Propose a new Router address. Takes effect after 48h.
+     * @notice Change the Router address instantly.
      */
-    function proposeRouterChange(address newRouter) external onlyOwner {
+    function changeRouter(address newRouter) external onlyOwner {
         require(newRouter != address(0), "GasVault: zero router");
-        pendingRouter = newRouter;
-        routerChangeTime = block.timestamp + ROUTER_CHANGE_DELAY;
-        emit RouterChangeProposed(newRouter, routerChangeTime);
-    }
-
-    /**
-     * @notice Execute the pending Router change after the timelock.
-     */
-    function executeRouterChange() external onlyOwner {
-        if (pendingRouter == address(0)) revert NoPendingRouter();
-        if (block.timestamp < routerChangeTime) revert RouterChangeLocked();
-
         address oldRouter = router;
-        router = pendingRouter;
-        pendingRouter = address(0);
-        routerChangeTime = 0;
+        router = newRouter;
         emit RouterChanged(oldRouter, router);
     }
 

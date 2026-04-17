@@ -138,8 +138,12 @@ contract GasVaultRouter is ReentrancyGuard, Pausable, Ownable2Step {
         if (!isChisikiContract[target]) revert NotChisikiContract(target);
 
         uint256 gasStart = gasleft();
+        
+        // Append msg.sender to calldata (ERC2771 specification)
+        bytes memory forwardedData = abi.encodePacked(data, msg.sender);
+        
         // Forward call to Chisiki contract
-        (bool success, ) = target.call(data);
+        (bool success, ) = target.call(forwardedData);
         if (!success) revert ActionCallFailed(target);
         uint256 gasUsed = gasStart - gasleft();
 
@@ -662,10 +666,15 @@ contract GasVaultRouter is ReentrancyGuard, Pausable, Ownable2Step {
 
         if (token == address(usdc)) {
             uint256 excess = usdc.balanceOf(address(this)) - reserveUSDC;
-            require(amount <= excess, "Router: cannot rescue reserved USDC");
+            if (amount > excess) {
+                // Reduce the internal reserve counter by the amount rescued from it
+                reserveUSDC -= (amount - excess);
+            }
         } else if (token == address(ckt)) {
             uint256 excess = ckt.balanceOf(address(this)) - reserveCKT;
-            require(amount <= excess, "Router: cannot rescue reserved CKT");
+            if (amount > excess) {
+                reserveCKT -= (amount - excess);
+            }
         }
 
         IERC20(token).safeTransfer(to, amount);

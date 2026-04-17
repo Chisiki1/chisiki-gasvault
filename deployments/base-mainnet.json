@@ -1,17 +1,17 @@
 {
   "network": "base-mainnet",
   "chainId": 8453,
-  "version": "2.5",
+  "version": "3.0",
   "deployer": "0x7d69916Bc7D7d6C1ff5F0deCf5dcF96C266805bC",
-  "deployedAt": "2026-04-16T14:43:00Z",
+  "deployedAt": "2026-04-17T15:00:00Z",
   "contracts": {
-    "GasVault": "0x430e158F6b32f5A3c063e0b3F1A9abC98cfeb30c",
-    "GasVaultRouter": "0xf7E2172C15b2DfD53AAd5628D1e2055bB7640D57"
+    "GasVault": "0xEFeA7203d86F8517AcF7c9806f5a8Bf25B82D066",
+    "GasVaultRouter": "0x3a89Ab39Df86989c294E45449d5Bd97ebA191B6A"
   },
   "previousDeployment": {
-    "GasVault_v1": "0x09E22b6a1937FbA0194c101E541E086C7711114e",
-    "GasVaultRouter_v1": "0xdCdB81B7BA194AD5F4440559afE0267C8cDBC4eD",
-    "status": "paused, deprecated"
+    "GasVault_v2": "0x430e158F6b32f5A3c063e0b3F1A9abC98cfeb30c",
+    "GasVaultRouter_v2": "0xf7E2172C15b2DfD53AAd5628D1e2055bB7640D57",
+    "status": "deprecated, completely migrated to v3"
   },
   "pools": {
     "CKT-USDC": "0xb434318910ed11a15fa86b38aa398efCf3C83df0",
@@ -28,5 +28,5 @@
     "0x3959172dc74ba6ac5abbf68b6ce24041c03e6a8a",
     "0xf82ee34ffd46c515a525014f874867f6c83d5a94"
   ],
-  "fix": "v2.5: SwapRouter02 deadline interface mismatch resolved + SwapFailed revert safety"
+  "fix": "v3.0: ERC-2771 Trusted Forwarder Meta-Transaction support + instant router updates"
 }
