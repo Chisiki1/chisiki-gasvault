@@ -12,7 +12,7 @@ const VAULT = "0xEFeA7203d86F8517AcF7c9806f5a8Bf25B82D066";
 const ROUTER = "0x3a89Ab39Df86989c294E45449d5Bd97ebA191B6A";
 const CKT = "0x5ccdf98d0b48bf8d51e9196d738c5bbf6b33c274";
 const USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
-const OWNER = "0x7af9dA55D2E4239700DEe0951c59Ab41E447c662";
+const OWNER = "0x7d69916Bc7D7d6C1ff5F0deCf5dcF96C266805bC";
 
 const CHISIKI = [
     "0x7e012e4d81921bc56282dac626f3591fe8c49b54",
@@ -65,7 +65,7 @@ async function main() {
     assert(routerOwner.toLowerCase() === OWNER.toLowerCase(), `router.owner = master`);
 
     const lpId = await router.lpTokenId();
-    assert(lpId === 4983601n, `lpTokenId = 4983601`);
+    assert(lpId === 4978169n, `lpTokenId = 4978169`);
 
     const paused = await router.paused();
     assert(!paused, `router not paused`);
