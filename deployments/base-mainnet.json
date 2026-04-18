@@ -5,8 +5,8 @@
   "deployer": "0x7af9dA55D2E4239700DEe0951c59Ab41E447c662",
   "deployedAt": "2026-04-17T08:58:00Z",
   "contracts": {
-    "GasVault": "0xbDF3F65341edb5503c0AeD76Ece81EdF378d879B",
-    "GasVaultRouter": "0x2DAc04aE445D214687b856C6BBcB5e5276495D11"
+    "GasVault": "0xEFeA7203d86F8517AcF7c9806f5a8Bf25B82D066",
+    "GasVaultRouter": "0x3a89Ab39Df86989c294E45449d5Bd97ebA191B6A"
   },
   "lpTokenId": 4983601,
   "pools": {

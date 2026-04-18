@@ -8,8 +8,8 @@ const { ethers } = require("ethers");
 const fs = require("fs");
 
 const RPC = "https://base-mainnet.public.blastapi.io";
-const VAULT = "0xbDF3F65341edb5503c0AeD76Ece81EdF378d879B";
-const ROUTER = "0x2DAc04aE445D214687b856C6BBcB5e5276495D11";
+const VAULT = "0xEFeA7203d86F8517AcF7c9806f5a8Bf25B82D066";
+const ROUTER = "0x3a89Ab39Df86989c294E45449d5Bd97ebA191B6A";
 const CKT = "0x5ccdf98d0b48bf8d51e9196d738c5bbf6b33c274";
 const USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const OWNER = "0x7af9dA55D2E4239700DEe0951c59Ab41E447c662";
